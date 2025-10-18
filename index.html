@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Daily Health Logger</title>
+  <style>
+    :root { --maxw: 880px; }
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; margin: 32px; background: #f9fafb; }
+    h1 { margin: 0 0 16px; }
+    p.hint { color: #475569; margin-top: 0; }
+    form { background: #fff; border: 1px solid #e5e7eb; border-radius: 16px; padding: 24px; max-width: var(--maxw); box-shadow: 0 1px 2px rgba(0,0,0,0.04); }
+    fieldset { border: 1px solid #e5e7eb; border-radius: 12px; padding: 16px; margin: 18px 0; }
+    legend { padding: 0 6px; color: #0f172a; font-weight: 600; }
+    .row { display: grid; grid-template-columns: 180px 1fr; gap: 10px 16px; align-items: center; margin: 8px 0; }
+    label { color: #111827; font-weight: 500; }
+    input, select { padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 10px; background: #fff; width: 100%; box-sizing: border-box; }
+    .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; }
+    .actions { display: flex; gap: 10px; margin-top: 16px; }
+    button { padding: 12px 16px; border: 1px solid #0ea5e9; background: #0ea5e9; color: #fff; border-radius: 10px; cursor: pointer; font-weight: 600; }
+    button.secondary { background: #fff; color: #0ea5e9; }
+    .footer { color: #475569; font-size: 12px; margin-top: 8px; }
+    .items { display: grid; grid-template-columns: 1fr 140px; gap: 10px; }
+    .preview-wrap { max-width: var(--maxw); margin-top: 16px; }
+    .preview-wrap h2 { font-size: 18px; margin: 6px 0; }
+    pre#output { white-space: pre-wrap; background: #ffffff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 16px; min-height: 120px; }
+  </style>
+</head>
+<body>
+  <h1>Daily Health Logger</h1>
+  <p class="hint">Fill in your day. The main button will save to your Google Sheet (only you can save) and show the text below. Use the other button to download the text file.</p>
+
+  <form id="healthForm">
+    <fieldset>
+      <legend>Day details</legend>
+      <div class="row"><label for="date">Date</label><input id="date" type="date" required></div>
+      <div class="row"><label for="weight">Weight (kg)</label><input id="weight" type="number" step="0.1" placeholder="87.8" required></div>
+      <div class="grid-2">
+        <div class="row"><label for="sleep">Sleep time</label><input id="sleep" type="time"></div>
+        <div class="row"><label for="wakeup">Wakeup</label><input id="wakeup" type="time"></div>
+      </div>
+      <div class="grid-2">
+        <div class="row"><label for="steps">Steps</label><input id="steps" type="number" inputmode="numeric" placeholder="5000"></div>
+        <div class="row"><label for="exercise">Exercise</label>
+          <select id="exercise">
+            <option value="">Select</option>
+            <option>Yes</option>
+            <option>No</option>
+          </select>
+        </div>
+      </div>
+      <div class="grid-2">
+        <div class="row"><label for="water">Water (litres)</label><input id="water" type="number" step="0.1" placeholder="3.5"></div>
+        <div class="row"><label for="mv">Multivitamin</label>
+          <select id="mv">
+            <option value="">Select</option>
+            <option>Yes</option>
+            <option>No</option>
+          </select>
+        </div>
+      </div>
+    </fieldset>
+
+    <!-- Meals -->
+    <fieldset>
+      <legend>Breakfast</legend>
+      <div class="row"><label for="b_time">Time</label><input id="b_time" type="time"></div>
+      <div class="items">
+        <input id="b_i1" placeholder="Item 1"><input id="b_g1" type="number" step="1" min="0" placeholder="grams">
+        <input id="b_i2" placeholder="Item 2"><input id="b_g2" type="number" step="1" min="0" placeholder="grams">
+        <input id="b_i3" placeholder="Item 3"><input id="b_g3" type="number" step="1" min="0" placeholder="grams">
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Lunch</legend>
+      <div class="row"><label for="l_time">Time</label><input id="l_time" type="time"></div>
+      <div class="items">
+        <input id="l_i1" placeholder="Item 1"><input id="l_g1" type="number" step="1" min="0" placeholder="grams">
+        <input id="l_i2" placeholder="Item 2"><input id="l_g2" type="number" step="1" min="0" placeholder="grams">
+        <input id="l_i3" placeholder="Item 3"><input id="l_g3" type="number" step="1" min="0" placeholder="grams">
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Dinner</legend>
+      <div class="row"><label for="d_time">Time</label><input id="d_time" type="time"></div>
+      <div class="items">
+        <input id="d_i1" placeholder="Item 1"><input id="d_g1" type="number" step="1" min="0" placeholder="grams">
+        <input id="d_i2" placeholder="Item 2"><input id="d_g2" type="number" step="1" min="0" placeholder="grams">
+        <input id="d_i3" placeholder="Item 3"><input id="d_g3" type="number" step="1" min="0" placeholder="grams">
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Snacks</legend>
+      <div class="row"><label for="s_time">Time</label><input id="s_time" type="time"></div>
+      <div class="items">
+        <input id="s_i1" placeholder="Item 1"><input id="s_g1" type="number" step="1" min="0" placeholder="grams">
+        <input id="s_i2" placeholder="Item 2"><input id="s_g2" type="number" step="1" min="0" placeholder="grams">
+        <input id="s_i3" placeholder="Item 3"><input id="s_g3" type="number" step="1" min="0" placeholder="grams">
+      </div>
+    </fieldset>
+
+    <div class="actions">
+      <button type="button" id="saveGenerateBtn">Save to Sheet + Generate Text</button>
+      <button type="button" class="secondary" id="downloadBtn">Download Text</button>
+    </div>
+    <div class="footer">Tip: leave grams blank if not needed. Items will still be listed.</div>
+  </form>
+
+  <div class="preview-wrap">
+    <h2>Generated text</h2>
+    <pre id="output"></pre>
+  </div>
+
+  <script>
+    // === SETTINGS ===
+    const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbxbmR5aGfs1fuIJhM6hu5GqTAafBBOxe8zss8gBy8wqM94KiZc_aT0cs18US-83F_U49w/exec
+'; // keep as your own script URL
+    const TOKEN = 'replace-with-a-random-secret'; // keep in sync with Apps Script
+
+    function formatDateAU(input) {
+      if (!input) return '';
+      const d = new Date(input + 'T00:00:00');
+      const day = String(d.getDate()).padStart(2, '0');
+      const month = d.toLocaleString('en-AU', { month: 'short' });
+      return `${day}-${month}`;
+    }
+
+    function formatTime12h(val) {
+      if (!val) return '';
+      const [h, m] = val.split(':');
+      const d = new Date();
+      d.setHours(+h, +m, 0, 0);
+      return d.toLocaleTimeString('en-AU', { hour: 'numeric', minute: '2-digit', hour12: true }).toLowerCase();
+    }
+
+    function linesForMeal(timeId, itemIds) {
+      const timeVal = document.getElementById(timeId).value;
+      const timeStr = formatTime12h(timeVal);
+      const itemLines = [];
+      itemIds.forEach(([iId, gId]) => {
+        const name = document.getElementById(iId).value.trim();
+        const grams = document.getElementById(gId).value.trim();
+        if (name) itemLines.push(`\t${name}${grams ? ` - ${grams}g` : ''}`);
+      });
+      if (!timeStr && itemLines.length === 0) return [];
+      return [`Time:\t${timeStr || ''}`, ...itemLines, '', ''];
+    }
+
+    function collectPayload() {
+      const g = id => document.getElementById(id)?.value?.trim() || '';
+      return {
+        date: g('date'), weight: g('weight'), sleep: g('sleep'), wakeup: g('wakeup'), steps: g('steps'), exercise: g('exercise'), water: g('water'), mv: g('mv'),
+        b_time: g('b_time'), b_i1: g('b_i1'), b_g1: g('b_g1'), b_i2: g('b_i2'), b_g2: g('b_g2'), b_i3: g('b_i3'), b_g3: g('b_g3'),
+        l_time: g('l_time'), l_i1: g('l_i1'), l_g1: g('l_g1'), l_i2: g('l_i2'), l_g2: g('l_g2'), l_i3: g('l_i3'), l_g3: g('l_g3'),
+        d_time: g('d_time'), d_i1: g('d_i1'), d_g1: g('d_g1'), d_i2: g('d_i2'), d_g2: g('d_g2'), d_i3: g('d_i3'), d_g3: g('d_g3'),
+        s_time: g('s_time'), s_i1: g('s_i1'), s_g1: g('s_g1'), s_i2: g('s_i2'), s_g2: g('s_g2'), s_i3: g('s_i3'), s_g3: g('s_g3')
+      };
+    }
+
+    function buildText(payload) {
+      const lines = [];
+      lines.push(`Date\t${formatDateAU(payload.date)}`);
+      lines.push('');
+      lines.push(`Weight(kg):\t${payload.weight}`);
+      lines.push(`Sleep time:\t${payload.sleep ? formatTime12h(payload.sleep) : ''}`);
+      lines.push(`Wakeup:\t${payload.wakeup ? formatTime12h(payload.wakeup) : ''}`);
+      lines.push(`Steps:\t${payload.steps || ''}`);
+      lines.push(`Exercise:\t${payload.exercise || ''}`);
+      lines.push(`Water:\t${payload.water ? payload.water + ' lts' : ''}`);
+      lines.push(`Multivitamin:\t${payload.mv || ''}`);
+      lines.push('', '');
+      lines.push(...linesForMeal('b_time', [['b_i1','b_g1'], ['b_i2','b_g2'], ['b_i3','b_g3']]));
+      lines.push(...linesForMeal('l_time', [['l_i1','l_g1'], ['l_i2','l_g2'], ['l_i3','l_g3']]));
+      lines.push(...linesForMeal('d_time', [['d_i1','d_g1'], ['d_i2','d_g2'], ['d_i3','d_g3']]));
+      lines.push(...linesForMeal('s_time', [['s_i1','s_g1'], ['s_i2','s_g2'], ['s_i3','s_g3']]));
+      return lines.join('\n');
+    }
+
+    async function saveToSheetTransposed(payload) {
+      // Posts to Apps Script which will store each date as a column
+      const res = await fetch(WEB_APP_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token: TOKEN, mode: 'TRANSPOSED', ...payload })
+      });
+      return res.json();
+    }
+
+    document.getElementById('saveGenerateBtn').addEventListener('click', async () => {
+      const payload = collectPayload();
+      if (!payload.date || !payload.weight) {
+        alert('Please enter date and weight.');
+        return;
+      }
+      try {
+        const resp = await saveToSheetTransposed(payload);
+        if (!resp.ok) { console.warn('Save failed', resp); alert('Save did not work. Check Apps Script is Only myself and that you are signed in.'); }
+      } catch (e) {
+        console.warn('Save error', e);
+      }
+      const text = buildText(payload);
+      document.getElementById('output').textContent = text;
+    });
+
+    document.getElementById('downloadBtn').addEventListener('click', () => {
+      const content = document.getElementById('output').textContent.trim();
+      if (!content) {
+        alert('No text to download yet. Use Save to Sheet + Generate Text first.');
+        return;
+      }
+      const blob = new Blob([content], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const y = new Date(document.getElementById('date').value || Date.now());
+      const fname = `daily-log-${y.getFullYear()}${String(y.getMonth()+1).padStart(2,'0')}${String(y.getDate()).padStart(2,'0')}.txt`;
+      const a = document.createElement('a');
+      a.href = url; a.download = fname; document.body.appendChild(a); a.click(); a.remove();
+      URL.revokeObjectURL(url);
+    });
+  </script>
+</body>
+</html>
